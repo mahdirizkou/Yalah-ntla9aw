@@ -1,9 +1,9 @@
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework import status
-from .models import User, Club, Event, Post, Notification, UserClub
+from ..models import User, Club, Event, Post, Notification, UserClub
 from rest_framework.response import Response
-from .serializers import (
+from ..serializers import (
     UserSerializer, ClubSerializer, EventSerializer,
     PostSerializer, NotificationSerializer, UserClubSerializer
 )
