@@ -1,4 +1,5 @@
 from django.urls import path
+from .views import auth_views
 from .views.apiviews import (
     UserListCreateAPIView, UserRetrieveUpdateDestroyAPIView,
     ClubListCreateAPIView, ClubRetrieveUpdateDestroyAPIView,
@@ -9,6 +10,10 @@ from .views.apiviews import (
 )
 
 urlpatterns = [
+    #authentication
+    path("register/", auth_views.register_view, name="register"),
+    path("login/", auth_views.login_view, name="login"),
+    
     # User
     path('users/', UserListCreateAPIView.as_view(), name='user-list-create'),
     path('users/<int:id_user>/', UserRetrieveUpdateDestroyAPIView.as_view(), name='user-detail'),
