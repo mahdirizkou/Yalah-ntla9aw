@@ -1,69 +1,41 @@
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt # i want testin postman 
-from django.contrib.auth.hashers import make_password, check_password
-from user.models import User
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.hashers import check_password
+from ..models import User
+from ..serializers import RegisterSerializer, LoginSerializer, UserSerializer
 
-@csrf_exempt
-def register_view(request):
-    if request.method == "POST":
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
 
-        if User.objects.filter(email=email).exists():
-            return JsonResponse({"error": "Email already registered"}, status=400)
+# -----------------------------
+# Register
+# -----------------------------
+class RegisterAPIView(APIView):
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        hashed_password = make_password(password)
 
-        user = User.objects.create(
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            password=hashed_password,
-            type="member"  
-        )
+# -----------------------------
+# Login
+# -----------------------------
+class LoginAPIView(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            password = serializer.validated_data['password']
 
-        
-        request.session['user_id'] = user.id_user
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({"error": "Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        return JsonResponse({
-            "message": "User registered successfully",
-            "user": {
-                "id": user.id_user,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "email": user.email,
-                "type": user.type
-            }
-        }, status=201)
+            if check_password(password, user.password):
+                return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    return JsonResponse({"error": "Invalid request method"}, status=405)
-
-@csrf_exempt
-def login_view(request):
-    if request.method == "POST":
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return JsonResponse({"error": "Email or password incorrect"}, status=400)
-
-        if check_password(password, user.password):
-            request.session['user_id'] = user.id_user
-            return JsonResponse({
-                "message": "Login successful",
-                "user": {
-                    "id": user.id_user,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "email": user.email,
-                    "type": user.type
-                }
-            })
-        else:
-            return JsonResponse({"error": "Email or password incorrect"}, status=400)
-
-    return JsonResponse({"error": "Invalid request method"}, status=405)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
