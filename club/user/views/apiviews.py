@@ -6,7 +6,7 @@ from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
 from ..serializers import (
     UserSerializer, ClubSerializer, EventSerializer,
-    PostSerializer, NotificationSerializer, UserClubSerializer , RegisterSerializer , LoginSerializer , CustomTokenObtainPairSerializer
+    PostSerializer, NotificationSerializer, UserClubSerializer , RegisterSerializer , LoginSerializer 
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -14,8 +14,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 # -----------------------------
 # Token
 # -----------------------------
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+# class CustomTokenObtainPairView(TokenObtainPairView):
+#     serializer_class = CustomTokenObtainPairSerializer
 # -----------------------------
 # Register
 # -----------------------------

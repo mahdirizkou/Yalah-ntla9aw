@@ -1,27 +1,63 @@
 from django.db import models
-
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 # -----------------------------
 # User Model
 # -----------------------------
-class User(models.Model):
+# class User(models.Model):
+#     USER_TYPES = [
+#         ('member', 'Member'),
+#         ('creator', 'Creator'),
+#         ('admin', 'Admin'),
+#     ]
+
+#     id_user = models.AutoField(primary_key=True)
+#     type = models.CharField(max_length=20, choices=USER_TYPES)
+#     first_name = models.CharField(max_length=100)
+#     last_name = models.CharField(max_length=100)
+#     email = models.EmailField(max_length=255, unique=True)
+#     password = models.CharField(max_length=255)
+#     registration_date = models.DateField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f"{self.first_name} {self.last_name}"
+
+
+class User(AbstractUser):
+    
     USER_TYPES = [
         ('member', 'Member'),
         ('creator', 'Creator'),
         ('admin', 'Admin'),
     ]
-
+    username = models.CharField(max_length=150, unique=True, default='user_default')
     id_user = models.AutoField(primary_key=True)
     type = models.CharField(max_length=20, choices=USER_TYPES)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=255, unique=True)
-    password = models.CharField(max_length=255)
-    registration_date = models.DateField(auto_now_add=True)
+    email = models.EmailField(unique=True)
+
+    # override ديال groups و permissions باش ما يكونش clash
+    groups = models.ManyToManyField(
+        Group,
+        related_name='custom_user_groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='custom_user_permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.username:
+            self.username = self.email
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
-
-
+        return self.username
 # -----------------------------
 # Club Model
 # -----------------------------

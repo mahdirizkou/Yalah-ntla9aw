@@ -1,46 +1,9 @@
 from rest_framework import serializers
 from .models import User, Club, Event, Post, Notification, UserClub
 from django.contrib.auth.hashers import make_password
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.contrib.auth import authenticate
 
 
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
-    username_field = 'email'
-
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
-
-    def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
-
-        user = authenticate(email=email, password=password)
-
-        if not user:
-            raise serializers.ValidationError(
-                "No active account found with the given credentials"
-            )
-
-    
-        attrs['username'] = email
-
- 
-        data = super().validate(attrs)
-
-       
-        data.update({
-            'user': {
-                'id_user': user.id_user,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'email': user.email,
-                'type': user.type,
-            }
-        })
-
-        return data
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

@@ -6,11 +6,11 @@ from .views.apiviews import (
     EventListCreateAPIView, EventRetrieveUpdateDestroyAPIView,
     PostListCreateAPIView, PostRetrieveUpdateDestroyAPIView,
     NotificationListCreateAPIView, NotificationRetrieveUpdateDestroyAPIView,
-    UserClubListCreateAPIView, UserClubRetrieveUpdateDestroyAPIView, RegisterAPIView, LoginAPIView , CustomTokenObtainPairView
+    UserClubListCreateAPIView, UserClubRetrieveUpdateDestroyAPIView, RegisterAPIView, LoginAPIView 
 )
 
 urlpatterns = [
-    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     #authentication
     path('register/', RegisterAPIView.as_view(), name='register'),
     path('login/', LoginAPIView.as_view(), name='login'),
