@@ -2,20 +2,15 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework import status
 from ..models import User, Club, Event, Post, Notification, UserClub
-from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
 from ..serializers import (
     UserSerializer, ClubSerializer, EventSerializer,
-    PostSerializer, NotificationSerializer, UserClubSerializer , RegisterSerializer , LoginSerializer 
+    PostSerializer, NotificationSerializer, UserClubSerializer,
+    RegisterSerializer
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
-# -----------------------------
-# Token
-# -----------------------------
-# class CustomTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = CustomTokenObtainPairSerializer
 # -----------------------------
 # Register
 # -----------------------------
@@ -29,47 +24,22 @@ class RegisterAPIView(APIView):
 
 
 # -----------------------------
-# Login
+# Login (JWT)
 # -----------------------------
-class LoginAPIView(APIView):
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data['email']
-            password = serializer.validated_data['password']
+class LoginAPIView(TokenObtainPairView):
+    """
+   
+    """
+    pass
 
-            try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                return Response({"error": "Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            if check_password(password, user.password):
-                return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": "Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # -----------------------------
-# User API Views classic methode
-# -----------------------------
-# class UserListCreateAPIView(APIView):
-#     def get(self,request):
-#         u = User.objects.all()
-#         s = UserSerializer(u ,many = True)
-#         return Response(s.data)
-    
-#     def post(self,request):
-#         s=UserSerializer(data= request.data)    
-#         if s.is_valid():
-#             s.save()
-#             return Response(s.data, status = status.HTTP_201_CREATED)
-#         return Response(s.errors, status = status.HTTP_400_BAD_REQUEST)
-# -----------------------------
-# User API Views generic methode
+# User API Views generic method
 # -----------------------------
 class UserListCreateAPIView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
 
 class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()

@@ -22,9 +22,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 #     def __str__(self):
 #         return f"{self.first_name} {self.last_name}"
 
-
 class User(AbstractUser):
-    
     USER_TYPES = [
         ('member', 'Member'),
         ('creator', 'Creator'),
@@ -35,7 +33,6 @@ class User(AbstractUser):
     type = models.CharField(max_length=20, choices=USER_TYPES)
     email = models.EmailField(unique=True)
 
-    # override ديال groups و permissions باش ما يكونش clash
     groups = models.ManyToManyField(
         Group,
         related_name='custom_user_groups',
@@ -51,6 +48,9 @@ class User(AbstractUser):
         verbose_name='user permissions',
     )
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
+
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = self.email
@@ -58,6 +58,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
 # -----------------------------
 # Club Model
 # -----------------------------
@@ -74,8 +75,6 @@ class Club(models.Model):
 
     def __str__(self):
         return self.name
-
-
 # -----------------------------
 # Event Model
 # -----------------------------
