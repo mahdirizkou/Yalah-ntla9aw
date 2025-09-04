@@ -1,5 +1,4 @@
 from django.urls import path
-from .views import auth_views
 from .views.apiviews import (
     UserListCreateAPIView, UserRetrieveUpdateDestroyAPIView,
     ClubListCreateAPIView, ClubRetrieveUpdateDestroyAPIView,
@@ -8,21 +7,12 @@ from .views.apiviews import (
     NotificationListCreateAPIView, NotificationRetrieveUpdateDestroyAPIView,
     UserClubListCreateAPIView, UserClubRetrieveUpdateDestroyAPIView,  RegisterView, LoginView
 )
-# from rest_framework_simplejwt.views import (
-#     TokenObtainPairView,
-#     TokenRefreshView,
-# )
 
   
 
 urlpatterns = [
-    # path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    #authentication
-    # path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    # path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('register/',  RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
-    
     # User
     path('users/', UserListCreateAPIView.as_view(), name='user-list-create'),
     path('users/<int:id_user>/', UserRetrieveUpdateDestroyAPIView.as_view(), name='user-detail'),
