@@ -1,7 +1,6 @@
 from rest_framework import generics
 from rest_framework.views import APIView
 from ..models import Club, Event, Post, Notification, UserClub
-from django.contrib.auth.hashers import check_password
 from ..serializers import (
     ClubSerializer, EventSerializer,
     PostSerializer, NotificationSerializer, UserClubSerializer 
@@ -13,7 +12,6 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from ..serializers import UserSerializer
-from rest_framework_simplejwt.exceptions import TokenError
 
 
 
@@ -35,8 +33,17 @@ class RegisterView(APIView):
         first_name = request.data.get('first_name', '')
         last_name = request.data.get('last_name', '')
 
+        if not username or not password:
+            return Response(
+                {"error": "Username and password are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if User.objects.filter(username=username).exists():
             return Response({"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if email and User.objects.filter(email=email).exists():
+            return Response({"error": "Email already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.create_user(
             username=username,
@@ -90,7 +97,8 @@ class UserListCreateAPIView(generics.ListCreateAPIView):
 class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    lookup_field = 'id_user'
+    lookup_field = 'id'
+    lookup_url_kwarg = 'id_user'
 
 # -----------------------------
 # Club API Views
